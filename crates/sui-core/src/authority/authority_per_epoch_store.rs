@@ -2822,7 +2822,6 @@ impl AuthorityPerEpochStore {
         transactions: &[VerifiedExecutableTransaction],
         randomness_round: Option<RandomnessRound>,
         cancelled_txns: &BTreeMap<TransactionDigest, CancelConsensusCertificateReason>,
-        //db_batch: &mut DBBatch,
         output: &mut ConsensusCommitOutput,
     ) -> SuiResult {
         let ConsensusSharedObjVerAssignment {
@@ -2836,8 +2835,6 @@ impl AuthorityPerEpochStore {
             cancelled_txns,
         )
         .await?;
-        //self.set_assigned_shared_object_versions_with_db_batch(assigned_versions, output)
-        //    .await?;
         output.set_assigned_shared_object_versions(assigned_versions, shared_input_next_versions);
         Ok(())
     }
@@ -3076,7 +3073,6 @@ impl AuthorityPerEpochStore {
         for (key, txns) in deferred_txns.into_iter() {
             total_deferred_txns += txns.len();
             output.defer_transactions(key, txns);
-            //self.defer_transactions(output, key, txns)?;
         }
         authority_metrics
             .consensus_handler_deferred_transactions
@@ -3183,7 +3179,6 @@ impl AuthorityPerEpochStore {
                     let mut l = self.get_reconfig_state_write_lock_guard();
                     l.close_all_certs();
                     output.store_reconfig_state(l.clone());
-                    //self.store_reconfig_state_batch(&l, output)?;
                     // Holding this lock until end of process_consensus_transactions_and_commit_boundary() where we write batch to DB
                     lock = Some(l);
                 };
@@ -3542,17 +3537,12 @@ impl AuthorityPerEpochStore {
         output: &mut ConsensusCommitOutput,
         checkpoint: &PendingCheckpointV2,
     ) -> SuiResult {
-        // TODO: is this check necessary?
-        if let Some(pending) = self.get_pending_checkpoint(&checkpoint.height())? {
-            if pending.roots() != checkpoint.roots() {
-                panic!("Received checkpoint at index {} that contradicts previously stored checkpoint. Old roots: {:?}, new roots: {:?}", checkpoint.height(), pending.roots(), checkpoint.roots());
-            }
-            debug!(
-                checkpoint_commit_height = checkpoint.height(),
-                "Ignoring duplicate checkpoint notification",
-            );
-            return Ok(());
-        }
+        assert!(
+            self.get_pending_checkpoint(&checkpoint.height())?.is_none(),
+            "Duplicate pending checkpoint notification at height {:?}",
+            checkpoint.height()
+        );
+
         debug!(
             checkpoint_commit_height = checkpoint.height(),
             "Pending checkpoint has {} roots",
@@ -3872,12 +3862,11 @@ impl ConsensusCommitOutput {
         &mut self,
         transactions: &[VerifiedExecutableTransaction],
     ) {
-        self.user_signatures_for_checkpoints
-            .reserve(transactions.len());
-        for tx in transactions {
-            self.user_signatures_for_checkpoints
-                .push((*tx.digest(), tx.tx_signatures().to_vec()));
-        }
+        self.user_signatures_for_checkpoints.extend(
+            transactions
+                .iter()
+                .map(|tx| (*tx.digest(), tx.tx_signatures().to_vec())),
+        );
     }
 
     fn record_consensus_commit_stats(&mut self, stats: ExecutionIndicesWithStats) {
@@ -3918,7 +3907,7 @@ impl ConsensusCommitOutput {
         self.pending_checkpoints.push(checkpoint);
     }
 
-    pub fn reserve_next_random_round(
+    pub fn reserve_next_randomness_round(
         &mut self,
         next_randomness_round: RandomnessRound,
         commit_timestamp: TimestampMs,

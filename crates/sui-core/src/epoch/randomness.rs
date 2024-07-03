@@ -763,7 +763,7 @@ impl RandomnessManager {
             .checked_add(1)
             .expect("RandomnessRound should not overflow");
 
-        output.reserve_next_random_round(self.next_randomness_round, commit_timestamp);
+        output.reserve_next_randomness_round(self.next_randomness_round, commit_timestamp);
 
         Ok(Some(randomness_round))
     }
