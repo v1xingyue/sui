@@ -275,10 +275,7 @@ impl VersionedDkgMessage {
     }
 
     pub fn is_valid_version(&self, dkg_version: u64) -> bool {
-        match (self, dkg_version) {
-            (VersionedDkgMessage::V1(_), 1) => true,
-            _ => false,
-        }
+        matches!((self, dkg_version), (VersionedDkgMessage::V1(_), 1))
     }
 }
 
@@ -309,10 +306,7 @@ impl VersionedDkgConfirmation {
     }
 
     pub fn is_valid_version(&self, dkg_version: u64) -> bool {
-        match (self, dkg_version) {
-            (VersionedDkgConfirmation::V1(_), 1) => true,
-            _ => false,
-        }
+        matches!((self, dkg_version), (VersionedDkgConfirmation::V1(_), 1))
     }
 }
 
