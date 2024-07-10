@@ -45,3 +45,10 @@ CREATE TABLE sui_progress_store
     id                           INT          PRIMARY KEY, -- dummy value
     txn_digest                   bytea        NOT NULL
 );
+
+CREATE TABLE eth_progress_store
+(
+    id                           INT          PRIMARY KEY, -- dummy value
+    earliest_block_synced        BIGINT       NOT NULL,
+    latest_block_synced          BIGINT       NOT NULL
+);

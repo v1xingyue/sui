@@ -1,6 +1,12 @@
-// Copyright (c) Mysten Labs, Inc.
-// SPDX-License-Identifier: Apache-2.0
 // @generated automatically by Diesel CLI.
+
+diesel::table! {
+    eth_progress_store (id) {
+        id -> Int4,
+        earliest_block_synced -> Int8,
+        latest_block_synced -> Int8,
+    }
+}
 
 diesel::table! {
     progress_store (task_name) {
@@ -46,6 +52,7 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
+    eth_progress_store,
     progress_store,
     sui_progress_store,
     token_transfer,

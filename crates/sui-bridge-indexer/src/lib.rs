@@ -7,7 +7,6 @@ use std::fmt::{Display, Formatter};
 
 pub mod config;
 pub mod eth_worker;
-pub mod latest_eth_syncer;
 pub mod metrics;
 pub mod models;
 pub mod postgres_manager;

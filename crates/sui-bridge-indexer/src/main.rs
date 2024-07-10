@@ -87,44 +87,48 @@ async fn main() -> Result<()> {
     let eth_client = Arc::new(
         EthClient::<ethers::providers::Http>::new(
             &config.eth_rpc_url,
-            HashSet::from_iter(vec![eth_worker.bridge_address()]),
+            HashSet::from_iter(vec![eth_worker.bridge_address]),
             bridge_metrics.clone(),
         )
         .await
         .map_err(|e| anyhow::anyhow!(e.to_string()))?,
     );
 
-    let unfinalized_handle = eth_worker
-        .start_indexing_unfinalized_events(eth_client.clone())
-        .await
-        .unwrap();
-    let finalized_handle = eth_worker
-        .start_indexing_finalized_events(eth_client.clone())
-        .await
-        .unwrap();
-    let handles = vec![unfinalized_handle, finalized_handle];
-
-    if let Some(sui_rpc_url) = config.sui_rpc_url.clone() {
-        start_processing_sui_checkpoints_by_querying_txes(
-            sui_rpc_url,
-            db_url.clone(),
-            indexer_meterics.clone(),
-            bridge_metrics,
-        )
-        .await
-        .unwrap();
-    } else {
-        let _ = start_processing_sui_checkpoints(
-            &config_clone,
-            db_url,
-            indexer_meterics,
-            ingestion_metrics,
-        )
+    eth_worker
+        .sync_events(eth_client.clone(), config.bridge_genesis_block)
         .await;
-    }
+
+    // let unfinalized_handle = eth_worker
+    //     .start_indexing_unfinalized_events(eth_client.clone())
+    //     .await
+    //     .unwrap();
+    // let finalized_handle = eth_worker
+    //     .start_indexing_finalized_events(eth_client.clone())
+    //     .await
+    //     .unwrap();
+    // let handles = vec![unfinalized_handle, finalized_handle];
+
+    // if let Some(sui_rpc_url) = config.sui_rpc_url.clone() {
+    //     start_processing_sui_checkpoints_by_querying_txes(
+    //         sui_rpc_url,
+    //         db_url.clone(),
+    //         indexer_meterics.clone(),
+    //         bridge_metrics,
+    //     )
+    //     .await
+    //     .unwrap();
+    // } else {
+    //     let _ = start_processing_sui_checkpoints(
+    //         &config_clone,
+    //         db_url,
+    //         indexer_meterics,
+    //         ingestion_metrics,
+    //     )
+    //     .await;
+    // }
 
     // We are not waiting for the sui tasks to finish here, which is ok.
-    let _ = futures::future::join_all(handles).await;
+    // let _ = futures::future::join_all(handles).await;
 
     Ok(())
 }

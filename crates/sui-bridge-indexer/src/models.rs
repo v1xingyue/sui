@@ -1,7 +1,9 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::schema::{progress_store, sui_progress_store, token_transfer, token_transfer_data};
+use crate::schema::{
+    eth_progress_store, progress_store, sui_progress_store, token_transfer, token_transfer_data,
+};
 use diesel::{Identifiable, Insertable, Queryable, Selectable};
 
 #[derive(Queryable, Selectable, Insertable, Identifiable, Debug)]
@@ -16,6 +18,14 @@ pub struct ProgressStore {
 pub struct SuiProgressStore {
     pub id: i32, // Dummy value
     pub txn_digest: Vec<u8>,
+}
+
+#[derive(Queryable, Selectable, Insertable, Identifiable, Debug)]
+#[diesel(table_name = eth_progress_store, primary_key(id))]
+pub struct EthProgressStore {
+    pub id: i32,
+    pub earliest_block_synced: i64,
+    pub latest_block_synced: i64,
 }
 
 #[derive(Queryable, Selectable, Insertable, Identifiable, Debug)]

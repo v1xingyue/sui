@@ -2,3 +2,4 @@
 DROP TABLE IF EXISTS token_transfer;
 DROP TABLE IF EXISTS token_transfer_data;
 DROP TABLE IF EXISTS progress_store;
+DROP TABLE IF EXISTS sui_progress_store;
