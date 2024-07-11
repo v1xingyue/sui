@@ -295,7 +295,7 @@ impl Interpreter {
         ty_args: Vec<Type>,
     ) -> PartialVMResult<Frame> {
         // The values are on the stack, in order.
-        let mut args = self.operand_stack.popn(func.arg_count() as u16)?;
+        let args = self.operand_stack.popn(func.arg_count() as u16)?;
         let locals = Locals::new_from(args, func.local_count());
         Ok(self.make_new_frame(func, ty_args, locals))
     }
