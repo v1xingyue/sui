@@ -1,5 +1,15 @@
 # @mysten/create-dapp
 
+## 0.3.12
+
+### Patch Changes
+
+- 0f27a97: Update dependencies
+- Updated dependencies [0fb0628]
+- Updated dependencies [0f27a97]
+  - @mysten/sui@1.2.2
+  - @mysten/dapp-kit@0.14.12
+
 ## 0.3.11
 
 ### Patch Changes
@@ -92,8 +102,10 @@
 
 ### Minor Changes
 
-- a92b03de42: The Typescript SDK has been renamed to `@mysten/sui` and includes many new features and breaking changes.
-  See the [full migration guide](https://sdk.mystenlabs.com/typescript/migrations/sui-1.0) for details on how to upgrade.
+- a92b03de42: The Typescript SDK has been renamed to `@mysten/sui` and includes many new features
+  and breaking changes. See the
+  [full migration guide](https://sdk.mystenlabs.com/typescript/migrations/sui-1.0) for details on
+  how to upgrade.
 
 ### Patch Changes
 
